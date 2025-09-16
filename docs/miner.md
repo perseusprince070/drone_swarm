@@ -117,21 +117,32 @@ pm2 stop     swarm_miner
 ## 🛠️ Creating Compliant Models
 
 ### Basic Training Scripts (Starting Points)
-Swarm provides **basic example scripts** in `RL/` that miners should **improve upon**:
+Swarm ships an **advanced PPO training harness** in `RL/train_RL_with_info.py`:
 
-**Basic Training Example:**
 ```bash
-# Basic PPO training example - IMPROVE THIS for better performance
-python swarm/RL/train_RL_with_info.py
+# Vectorised PPO with curriculum, reward shaping and auto-eval
+python swarm/RL/train_RL_with_info.py \
+    --total-timesteps 3000000 \
+    --num-envs 8 \
+    --tensorboard-log runs/ppo_drone
 ```
+
+Key features:
+
+- Resamples a fresh procedurally generated task every episode (no overfitting).
+- Optional curriculum that widens the goal radius over the first `--curriculum-episodes`.
+- Dense potential-based reward shaping plus action smoothing penalties.
+- Parallel training via `SubprocVecEnv`, observation normalisation and SDE exploration.
+- Automatic evaluation on a fixed seed suite with checkpointing of the best model.
+- Secure export with `safe_policy_meta.json` and saved `VecNormalize` statistics.
+
+You can customise all behaviour via CLI flags (`--help` lists every option).
 
 **Model Compliance Testing:**
 ```bash
 # Test ANY model for security compliance (ALWAYS use this)
 python -m RL.test_secure_RL --model model/ppo_policy.zip [--seed 42] [--gui]
 ```
-
-⚠️ **The provided scripts are minimal examples** - successful miners develop their own advanced training approaches.
 
 ### Making ANY Model Compliant
 
